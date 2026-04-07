@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Lab Virtual – Jamur (Fungi)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fff8f0;--surf:#ffffff;--surf2:#fffbf5;
+  --border:#f0dcc5;--border2:#e8c49a;
+  --acc:#d97706;--acc2:#f59e0b;--acc3:#b45309;
+  --text:#1e293b;--text2:#475569;--text3:#94a3b8;
+  --red:#dc2626;--green:#059669;
+  --h:56px;
+}
+@media(max-width:768px){:root{--h:46px;}}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 60% 40% at 10% 0%,rgba(217,119,6,.07) 0%,transparent 60%),
+    radial-gradient(ellipse 40% 50% at 90% 100%,rgba(245,158,11,.06) 0%,transparent 60%),
+    repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(148,163,184,.06) 40px),
+    repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(148,163,184,.06) 40px);}
+/* HEADER */
+header{position:relative;z-index:10;height:var(--h);flex-shrink:0;
+  background:linear-gradient(135deg,#7c2d00,#c2410c);
+  border-bottom:1px solid rgba(255,255,255,.12);
+  display:flex;align-items:center;padding:0 14px;gap:10px;
+  box-shadow:0 2px 10px rgba(80,20,0,.45);}
+.logo{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.logo-icon{width:34px;height:34px;border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+.logo-text{font-family:'Space Grotesk',sans-serif;font-size:clamp(13px,2vw,21px);font-weight:700;color:#fff;line-height:1.1;}
+.logo-sub{font-size:9px;color:rgba(255,255,255,.75);}
+nav{display:flex;gap:2px;flex:1;overflow-x:auto;scrollbar-width:none;}
+nav::-webkit-scrollbar{display:none;}
+.nb{position:relative;background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-family:'Inter',sans-serif;font-size:clamp(11px,1.3vw,13px);font-weight:500;padding:0 10px;height:var(--h);white-space:nowrap;transition:color .2s;touch-action:manipulation;}
+.nb::after{content:'';position:absolute;bottom:0;left:8px;right:8px;height:2px;background:#fde68a;transform:scaleX(0);transition:transform .2s;border-radius:2px 2px 0 0;}
+.nb:hover,.nb:focus{color:#fff;outline:none;}
+.nb.active{color:#fff;}
+.nb.active::after{transform:scaleX(1);}
+#menuToggle{display:none;background:none;border:none;cursor:pointer;padding:8px;color:#fff;flex-shrink:0;touch-action:manipulation;margin-left:auto;}
+@media(max-width:600px){
+  .logo-sub{display:none;}
+  #menuToggle{display:flex;align-items:center;justify-content:center;}
+  nav{display:none;flex-direction:column;position:fixed;top:var(--h);left:0;right:0;z-index:9990;
+    background:linear-gradient(180deg,#7c2d00,#c2410c);
+    border-bottom:1px solid rgba(255,255,255,.15);box-shadow:0 8px 24px rgba(0,0,0,.4);gap:0;}
+  nav.open{display:flex;}
+  .nb{height:50px;width:100%;text-align:left;padding:0 18px;border-bottom:1px solid rgba(255,255,255,.07);font-size:14px;display:flex;align-items:center;gap:10px;}
+  .nb::after{display:none;}
+  .nb.active{background:rgba(255,255,255,.09);}
+}
+/* APP */
+#app{position:relative;z-index:1;flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.page{display:none;flex:1;overflow:hidden;}
+.page.active{display:flex;flex-direction:column;}
+@keyframes fu{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+.page.active{animation:fu .2s ease;}
+.scroll{flex:1;overflow-y:auto;padding:10px 12px 14px;-webkit-overflow-scrolling:touch;}
+.scroll::-webkit-scrollbar{width:4px;}
+.scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+/* CARDS */
+.card{background:var(--surf);border:1px solid var(--border);border-radius:9px;padding:11px 13px;margin-bottom:7px;box-shadow:0 1px 3px rgba(30,41,59,.05);}
+.card:hover{border-color:var(--border2);}
+.ch{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
+.ci{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.ci.b{background:rgba(217,119,6,.12);}
+.ci.y{background:rgba(245,158,11,.12);}
+.ci.g{background:rgba(5,150,105,.10);}
+.ci.r{background:rgba(220,38,38,.10);}
+.ct{font-family:'Space Grotesk',sans-serif;font-size:clamp(12px,1.4vw,14px);font-weight:700;color:var(--acc3);}
+.card p{font-size:clamp(11px,1.2vw,13px);line-height:1.65;color:var(--text2);margin-bottom:5px;}
+.card p:last-child{margin-bottom:0;}
+.card h4{font-size:clamp(9px,1vw,11px);font-weight:700;color:var(--acc);letter-spacing:.08em;text-transform:uppercase;margin:8px 0 4px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+@media(max-width:500px){.two-col{grid-template-columns:1fr;}}
+.olist{list-style:none;}
+.olist li{display:flex;align-items:flex-start;gap:7px;font-size:clamp(11px,1.2vw,13px);color:var(--text2);line-height:1.6;padding:4px 0;border-bottom:1px solid var(--border);}
+.olist li:last-child{border-bottom:none;}
+.olist li::before{content:'›';color:var(--acc);font-weight:700;font-size:15px;margin-top:-1px;}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px;margin-top:5px;}
+.fi{background:var(--surf2);border:1px solid var(--border);border-radius:7px;padding:7px 9px;}
+.fi strong{display:block;font-size:clamp(10px,1.1vw,12px);color:var(--acc3);margin-bottom:3px;}
+.fi span{font-size:clamp(10px,1.1vw,12px);color:var(--text2);line-height:1.5;}
+.chips{display:flex;gap:5px;margin:5px 0;flex-wrap:wrap;}
+.chip{border-radius:5px;padding:3px 7px;font-size:clamp(10px,1.1vw,12px);font-weight:500;}
+.chip-b{background:rgba(217,119,6,.08);border:1px solid rgba(217,119,6,.2);color:#b45309;}
+.chip-g{background:rgba(5,150,105,.08);border:1px solid rgba(5,150,105,.2);color:#047857;}
+/* STEP */
+.step{display:flex;gap:9px;align-items:flex-start;background:var(--surf2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;transition:border-color .15s;}
+.step:hover{border-color:var(--acc2);background:#fffbeb;}
+.snum{min-width:19px;height:19px;border-radius:50%;background:rgba(217,119,6,.12);border:1px solid rgba(217,119,6,.3);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--acc);flex-shrink:0;margin-top:1px;}
+.step p{font-size:clamp(11px,1.2vw,13px);color:var(--text2);line-height:1.6;margin:0;}
+/* CTRL */
+.ctrl-panel{background:var(--surf);border:1px solid var(--border);border-radius:9px;padding:11px;display:flex;flex-direction:column;gap:8px;overflow-y:auto;box-shadow:0 1px 3px rgba(30,41,59,.05);-webkit-overflow-scrolling:touch;}
+.ctrl-panel h3{font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;color:var(--acc3);}
+.cg label{display:block;font-size:9px;font-weight:700;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;}
+select{width:100%;background:#fff;border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 24px 7px 8px;font-family:'Inter',sans-serif;font-size:12px;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%23d97706' d='M5 7L0 2h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 8px center;}
+select:focus{border-color:var(--acc);box-shadow:0 0 0 2px rgba(217,119,6,.12);outline:none;}
+.btn{width:100%;border:none;border-radius:7px;padding:9px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .17s;touch-action:manipulation;-webkit-appearance:none;}
+.btn-start{background:linear-gradient(135deg,#b45309,#f59e0b);color:#fff;box-shadow:0 2px 8px rgba(217,119,6,.3);}
+.btn-start:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 4px 14px rgba(217,119,6,.38);}
+.btn-start:disabled{opacity:.4;cursor:not-allowed;}
+.btn-stop{background:#fff1f2;border:1px solid #fecdd3;color:var(--red);}
+.btn-stop:disabled{opacity:.35;cursor:not-allowed;}
+.btn-reset{background:var(--surf2);border:1px solid var(--border);color:var(--text2);}
+.btn-reset:hover{border-color:var(--acc);color:var(--acc);background:#fffbeb;}
+/* TABLE */
+.wstable{width:100%;border-collapse:collapse;font-size:11px;}
+.wstable th{background:#fffbeb;color:var(--acc3);padding:5px 7px;text-align:left;border:1px solid var(--border);font-size:9px;text-transform:uppercase;letter-spacing:.04em;font-weight:700;}
+.wstable td{padding:5px 7px;border:1px solid var(--border);color:var(--text2);}
+.wstable tr:nth-child(even) td{background:#fffbf5;}
+/* DISKUSI */
+.disc-area{width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 10px;font-family:'Inter',sans-serif;font-size:12px;color:var(--text);background:var(--surf2);resize:vertical;outline:none;transition:border-color .15s;line-height:1.6;margin-top:4px;-webkit-appearance:none;}
+.disc-area:focus{border-color:var(--acc);box-shadow:0 0 0 2px rgba(217,119,6,.1);}
+/* SIM TABS */
+.sim-tab{display:flex;gap:4px;align-items:center;}
+.stab{background:var(--surf2);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;color:var(--text2);transition:all .17s;touch-action:manipulation;white-space:nowrap;-webkit-appearance:none;}
+.stab.active{background:linear-gradient(135deg,#b45309,#f59e0b);color:#fff;border-color:transparent;box-shadow:0 2px 8px rgba(217,119,6,.3);}
+/* HUD */
+.hud-row{display:flex;gap:5px;flex-shrink:0;flex-wrap:wrap;}
+.hud-box{flex:1;min-width:60px;background:var(--surf2);border:1px solid var(--border);border-radius:7px;padding:5px 7px;text-align:center;}
+.hud-val{font-family:'JetBrains Mono',monospace;font-size:clamp(13px,1.8vw,17px);font-weight:700;color:var(--acc);display:block;line-height:1.2;}
+.hud-lbl{font-size:8.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;}
+/* DRAG */
+.drag-item{touch-action:none;-webkit-user-select:none;user-select:none;cursor:grab;position:relative;}
+/* ANIMATIONS */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes popIn{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+@keyframes stepZoom{0%{transform:scale(1)}50%{transform:scale(1.04)}100%{transform:scale(1)}}
+.step-box-zoom{animation:stepZoom .3s cubic-bezier(.34,1.56,.64,1);}
+/* LOADING */
+#loadScreen{position:fixed;inset:0;z-index:99999;
+  background:linear-gradient(135deg,#7c2d00 0%,#c2410c 50%,#d97706 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity .6s ease;}
+#loadScreen.hide{opacity:0;pointer-events:none;}
+.ll{font-size:clamp(52px,9vw,76px);margin-bottom:8px;}
+.lt{font-family:'Space Grotesk',sans-serif;font-size:clamp(17px,3vw,27px);font-weight:800;color:#fff;margin-bottom:4px;}
+.ls{font-family:'JetBrains Mono',monospace;font-size:clamp(9px,1.2vw,12px);color:#fde68a;letter-spacing:.15em;text-transform:uppercase;margin-bottom:22px;}
+.lbw{width:clamp(190px,30vw,310px);height:6px;background:rgba(255,255,255,.18);border-radius:6px;overflow:hidden;margin-bottom:8px;}
+.lbs{height:100%;width:0%;background:linear-gradient(90deg,#fde68a,#f59e0b,#fb923c);border-radius:6px;transition:width .1s linear;}
+.lp{font-family:'JetBrains Mono',monospace;font-size:clamp(12px,1.5vw,15px);color:#fff;font-weight:700;margin-bottom:11px;}
+.lst{font-size:clamp(10px,1.2vw,12px);color:#fde68a;margin-bottom:26px;min-height:16px;}
+#btnMulai{display:none;background:linear-gradient(135deg,#059669,#10b981);color:#fff;border:none;border-radius:10px;
+  padding:11px 30px;font-family:'Space Grotesk',sans-serif;font-size:clamp(12px,1.5vw,14px);font-weight:700;
+  cursor:pointer;box-shadow:0 4px 18px rgba(5,150,105,.4);touch-action:manipulation;-webkit-appearance:none;
+  animation:popIn .4s cubic-bezier(.34,1.56,.64,1);}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loadScreen">
+  <div class="ll"><img src="https://i.ibb.co.com/hJ6YGFWq/Jamur.png" style="width:76px;height:76px;object-fit:contain;vertical-align:middle;" alt=""></div>
+  <div class="lt">Lab Maya Biologi</div>
+  <div class="ls">Jamur (Fungi)</div>
+  <div class="lbw"><div class="lbs" id="lBar"></div></div>
+  <div class="lp" id="lPct">0%</div>
+  <div class="lst" id="lSt">Menyiapkan laboratorium…</div>
+  <button id="btnMulai" onclick="startPraktikum()"><img src="https://i.ibb.co.com/hJ6YGFWq/Jamur.png" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;" alt=""> Mulai Praktikum</button>
+</div>
+<script>
+(function(){
+  const bar=document.getElementById('lBar'),pct=document.getElementById('lPct'),st=document.getElementById('lSt');
+  const msgs=['Menyiapkan media tumbuh…','Mengatur suhu inkubator…','Menyiapkan substrat percobaan…','Laboratorium siap!'];
+  let v=0,idx=0;
+  const iv=setInterval(()=>{
+    v=Math.min(100,v+100/150);const vi=Math.floor(v);
+    bar.style.width=vi+'%';pct.textContent=vi+'%';
+    const ni=vi<30?0:vi<60?1:vi<90?2:3;
+    if(ni!==idx){idx=ni;st.textContent=msgs[idx];}
+    if(v>=100){clearInterval(iv);pct.textContent='100%';st.textContent='✅ Siap digunakan!';document.getElementById('btnMulai').style.display='block';}
+  },20);
+})();
+function startPraktikum(){
+  const ls=document.getElementById('loadScreen');
+  ls.classList.add('hide');setTimeout(()=>{ls.style.display='none';},650);
+}
+</script>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon"><img src="https://i.ibb.co.com/hJ6YGFWq/Jamur.png" style="width:28px;height:28px;object-fit:contain;vertical-align:middle;" alt=""></div>
+    <div>
+      <div class="logo-text">Lab Maya Biologi</div>
+      <div class="logo-sub">Jamur (Fungi) · Kelas X SMA</div>
+    </div>
+  </div>
+  <button id="menuToggle" onclick="toggleNav()" aria-label="Menu">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+  <nav id="mainNav" style="margin-left:0;justify-content:flex-end;">
+    <button class="nb active" onclick="show('tujuan',this);closeNav()">🎯 Tujuan</button>
+    <button class="nb" onclick="show('teori',this);closeNav()">📚 Teori</button>
+    <button class="nb" onclick="show('alatbahan',this);closeNav()">🔧 Alat &amp; Bahan</button>
+    <button class="nb" onclick="show('prosedur',this);closeNav()">📋 Prosedur</button>
+    <button class="nb" onclick="show('simulasi',this);closeNav()">🔬 Simulasi</button>
+    <button class="nb" onclick="show('diskusi',this);closeNav()">💬 Diskusi</button>
+  </nav>
+</header>
+
+<div id="app">
+
+<!-- ══ TUJUAN ══ -->
+<div id="page-tujuan" class="page active">
+  <div class="scroll">
+    <div class="card">
+      <div class="ch"><div class="ci b">🎯</div><div class="ct">Tujuan Pembelajaran</div></div>
+      <ul class="olist">
+        <li>Mendeskripsikan peranan jamur</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ci b">🔬</div><div class="ct">Tujuan Percobaan</div></div>
+      <ul class="olist">
+        <li>Mengetahui pengaruh <strong style="color:var(--acc)">suhu</strong> terhadap pertumbuhan jamur</li>
+        <li>Mengetahui pengaruh <strong style="color:var(--acc)">kelembapan</strong> terhadap pertumbuhan jamur</li>
+        <li>Mengetahui <strong style="color:var(--acc)">substrat</strong> yang paling cepat ditumbuhi jamur</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ci g">🏆</div><div class="ct">Hasil Belajar</div></div>
+      <ul class="olist">
+        <li>Memahami faktor lingkungan yang mempengaruhi pertumbuhan jamur</li>
+        <li>Menganalisis data pengamatan pertumbuhan jamur</li>
+        <li>Menghubungkan hasil percobaan dengan kehidupan sehari-hari</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TEORI ══ -->
+<div id="page-teori" class="page">
+  <div class="scroll">
+    <div class="card">
+      <div class="ch"><div class="ci b">📖</div><div class="ct">Dasar Teori</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div>
+          <p><strong style="color:var(--acc3)">Jamur (Fungi)</strong> adalah organisme eukariotik yang tidak berklorofil. Jamur memperoleh nutrisi secara absorpsi dari substrat organik (saprofit/parasit). Struktur tubuhnya terdiri dari benang-benang tipis bernama <strong style="color:var(--acc)">hifa</strong> yang membentuk jaringan kompleks disebut <strong style="color:var(--acc)">miselium</strong>.</p>
+          <h4>Pengaruh Suhu</h4>
+          <p>Suhu berhubungan langsung dengan aktivitas enzim. Suhu optimal <strong style="color:var(--acc)">25–30°C</strong> memaksimalkan pertumbuhan. Suhu terlalu rendah atau tinggi menghambat enzim.</p>
+        </div>
+        <div>
+          <h4>Pengaruh Kelembapan</h4>
+          <p>Jamur membutuhkan lingkungan <strong style="color:var(--acc)">lembap</strong> agar spora dapat berkecambah dan metabolisme berjalan. Kondisi kering sangat menghambat pertumbuhan hifa.</p>
+          <h4>Pengaruh Substrat</h4>
+          <p>Substrat seperti <strong style="color:var(--acc)">roti, nasi, dan tomat</strong> menyediakan nutrisi berbeda. Kandungan karbohidrat dan kadar air substrat menentukan kecepatan pertumbuhan hifa mikroskopis.</p>
+        </div>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <div class="ch"><div class="ci y">🌡️</div><div class="ct">Rentang Suhu</div></div>
+        <div class="fgrid" style="grid-template-columns:1fr 1fr 1fr;">
+          <div class="fi"><strong><img src="https://i.ibb.co.com/NdCvVd4w/Kulkas.png" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;" alt=""> Kulkas</strong><span>~5°C, pertumbuhan sangat lambat</span></div>
+          <div class="fi"><strong><img src="https://i.ibb.co.com/LXWFvqzL/Termometer.png" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;" alt=""> Ruang</strong><span>~25°C, pertumbuhan optimal</span></div>
+          <div class="fi"><strong>🔥 Hangat</strong><span>~37°C, pertumbuhan mulai lambat</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ch"><div class="ci b">🧫</div><div class="ct">Substrat &amp; Nutrisi</div></div>
+        <p>Karbohidrat dan kadar air substrat menentukan seberapa cepat hifa menyebar. Tomat kaya gula sederhana dan air, paling ideal untuk pertumbuhan cepat.</p>
+        <div class="chips">
+          <span class="chip chip-b"><img src="https://i.ibb.co.com/xS0KHcdN/Roti.png" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;" alt=""> Roti — karbohidrat</span>
+          <span class="chip chip-b"><img src="https://i.ibb.co.com/XxC7H26R/Nasi.png" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;" alt=""> Nasi — pati</span>
+          <span class="chip chip-g"><img src="https://i.ibb.co.com/hJD8VGCc/Tomat.png" style="width:14px;height:14px;object-fit:contain;vertical-align:middle;" alt=""> Tomat — gula &amp; air</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ALAT & BAHAN ══ -->
+<div id="page-alatbahan" class="page">
+  <div class="scroll">
+    <div class="two-col" style="margin-bottom:8px;">
+      <div class="card" style="margin-bottom:0;">
+        <div class="ch"><div class="ci b">🔧</div><div class="ct">Daftar Alat &amp; Bahan</div></div>
+        <p style="font-size:11px;color:var(--text3);margin-bottom:9px;">Seret setiap item ke area <strong>Meja Percobaan</strong> di sebelah kanan.</p>
+        <div id="drag-src" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;">
+          <div class="drag-item" data-id="wadah" data-type="alat" style="background:#fffbeb;border:1.5px dashed #fcd34d;border-radius:10px;padding:9px 6px;text-align:center;">
+            <div style="margin-bottom:3px;"><img src="https://i.ibb.co.com/8QjfW2L/Wadah-Tertutup.png" style="width:36px;height:36px;object-fit:contain;vertical-align:middle;" alt=""></div>
+            <div style="font-size:11px;font-weight:600;color:var(--acc3);">Wadah Tertutup</div>
+            <div style="font-size:9px;color:var(--text3);">Plastik/toples</div>
+          </div>
+          <div class="drag-item" data-id="label" data-type="alat" style="background:#fffbeb;border:1.5px dashed #fcd34d;border-radius:10px;padding:9px 6px;text-align:center;">
+            <div style="margin-bottom:3px;"><img src="https://i.ibb.co.com/G4vKy2yj/Label-Spidol.png" style="width:36px;height:36px;object-fit:contain;vertical-align:middle;" alt=""></div>
+            <div style="font-size:11px;font-weight:600;color:var(--acc3);">Label &amp; Spidol</div>
+            <div style="font-size:9px;color:var(--text3);">Penanda sampel</div>
+          </div>
+          <div class="drag-item" data-id="kulkas" data-type="alat" style="background:#fffbeb;border:1.5px dashed #fcd34d;border-radius:10px;padding:9px 6px;text-align:center;">
+            <div style="margin-bottom:3px;"><img src="https://i.ibb.co.com/NdCvVd4w/Kulkas.png" style="width:36px;height:36px;object-fit:contain;vertical-align:middle;" alt=""></div>
+            <div style="font-size:11px;font-weight:600;color:var(--acc3);">Kulkas</div>
+            <div style="font-size:9px;color:var(--text3);">Suhu rendah</div>
+          </div>
+          <div class="drag-item" data-id="termometer" data-type="alat" style="background:#fffbeb;border:1.5px dashed #fcd34d;border-radius:10px;padding:9px 6px;text-align:center;">
+            <div style="margin-bottom:3px;"><img src="https://i.ibb.co.com/LXWFvqzL/Termometer.png" style="width:36px;height:36px;object-fit:contain;vertical-align:middle;" alt=""></div>
+            <div style="font-size:11px;font-weight:600;color:var(--acc3);">Termometer</div>
+            <div style="font-size:9px;color:var(--text3);">Pengukur suhu</div>
+          </div>
+          <div class="drag-item" data-id="lup" data-type="alat" style="background:#fffbeb;border:1.5px dashed #fcd34d;border-radius:10px;padding:9px 6px;text-align:center;">
+            <div style="margin-bottom:3px;"><img src="https://i.ibb.co.com/nNrKm27J/Lup.png" style="width:36px;height:36px;object-fit:contain;vertical-align:middle;" alt=""></div>
+            <div style="font-size:11px;font-weight:600;color:var(--acc3);">Lup</div>
+            <div style="font-size:9px;color:var(--text3);">Kaca pembesar</div>
+          </div>
+          <div class="drag-item" data-id="stopwatch" data-type="alat" style="background:#fffbeb;border:1.5px dashed #fcd34d;border-radius:10px;padding:9px 6px;text-align:center;">
+            <div style="margin-bottom:3px;"><img src="https://i.ibb.co.com/4vZwjFB/Stopwatch.png" style="width:36px;height:36px;object-fit:contain;vertical-align:middle;" alt=""></div>
+            <div style="font-size:11px;font-weight:600;color:var(--acc3);">Stopwatch</div>
+            <div style="font-size:9px;color:var(--text3);">Pencatat hari</div>
+          </div>
+          <div class="drag-item" data-id="roti" data-type="bahan" style="background:#f0fdf4;border:1.5px dashed #86efac;border-radius:10px;padding:9px 6px;text-align:center;">
+            <div style="margin-bottom:3px;"><img src="https://i.ibb.co.com/xS0KHcdN/Roti.png" style="width:36px;height:36px;object-fit:contain;vertical-align:middle;" alt=""></div>
+            <div style="font-size:11px;font-weight:600;color:#065f46;">Roti</div>
+            <div style="font-size:9px;color:var(--text3);">Substrat 1</div>
+          </div>
+          <div class="drag-item" data-id="nasi" data-type="bahan" style="background:#f0fdf4;border:1.5px dashed #86efac;border-radius:10px;padding:9px 6px;text-align:center;">
+            <div style="margin-bottom:3px;"><img src="https://i.ibb.co.com/XxC7H26R/Nasi.png" style="width:36px;height:36px;object-fit:contain;vertical-align:middle;" alt=""></div>
+            <div style="font-size:11px;font-weight:600;color:#065f46;">Nasi</div>
+            <div style="font-size:9px;color:var(--text3);">Substrat 2</div>
+          </div>
+          <div class="drag-item" data-id="tomat" data-type="bahan" style="background:#f0fdf4;border:1.5px dashed #86efac;border-radius:10px;padding:9px 6px;text-align:center;">
+            <div style="margin-bottom:3px;"><img src="https://i.ibb.co.com/hJD8VGCc/Tomat.png" style="width:36px;height:36px;object-fit:contain;vertical-align:middle;" alt=""></div>
+            <div style="font-size:11px;font-weight:600;color:#065f46;">Tomat</div>
+            <div style="font-size:9px;color:var(--text3);">Substrat 3</div>
+          </div>
+          <div class="drag-item" data-id="air" data-type="bahan" style="background:#f0fdf4;border:1.5px dashed #86efac;border-radius:10px;padding:9px 6px;text-align:center;">
+            <div style="margin-bottom:3px;"><img src="https://i.ibb.co.com/93cbmbd0/Air.png" style="width:36px;height:36px;object-fit:contain;vertical-align:middle;" alt=""></div>
+            <div style="font-size:11px;font-weight:600;color:#065f46;">Air</div>
+            <div style="font-size:9px;color:var(--text3);">Kelembapan</div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:0;background:linear-gradient(135deg,#fffbf5,#fff8f0);border:2px dashed var(--border2);">
+        <div class="ch"><div class="ci y">🍄</div><div class="ct">Meja Percobaan</div></div>
+        <p style="font-size:11px;color:var(--text3);margin-bottom:9px;">Susun alat dan bahan di sini.</p>
+        <div style="font-size:9px;font-weight:700;color:var(--acc);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;">⚙️ Alat</div>
+        <div id="drop-alat" style="min-height:108px;border:2px dashed #fcd34d;border-radius:10px;background:#fffbeb;padding:8px;display:flex;flex-wrap:wrap;gap:7px;align-items:flex-start;transition:all .2s;margin-bottom:10px;position:relative;">
+          <span id="drop-alat-hint" style="color:#fcd34d;font-size:11px;width:100%;text-align:center;padding:10px 0;pointer-events:none;">← Seret alat ke sini</span>
+        </div>
+        <div style="font-size:9px;font-weight:700;color:#059669;letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;">🧫 Bahan</div>
+        <div id="drop-bahan" style="min-height:108px;border:2px dashed #86efac;border-radius:10px;background:#f0fdf4;padding:8px;display:flex;flex-wrap:wrap;gap:7px;align-items:flex-start;transition:all .2s;position:relative;">
+          <span id="drop-bahan-hint" style="color:#86efac;font-size:11px;width:100%;text-align:center;padding:10px 0;pointer-events:none;">← Seret bahan ke sini</span>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ci y">💡</div><div class="ct">Catatan Penggunaan</div></div>
+      <p>Gunakan wadah bersih dan tertutup rapat agar kondisi kelembapan dapat dikontrol. Tambahkan sedikit air pada sampel "lembap". Simpan sampel sesuai kondisi masing-masing dan amati setiap hari selama 3–5 hari. Gunakan lup untuk mengamati pertumbuhan hifa secara detail.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PROSEDUR ══ -->
+<div id="page-prosedur" class="page">
+  <div style="flex:1;overflow:hidden;padding:8px 12px 8px;display:flex;flex-direction:column;gap:7px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;flex:1;min-height:0;overflow:hidden;">
+      <div style="display:flex;flex-direction:column;gap:6px;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+        <div class="card" style="margin-bottom:0;flex-shrink:0;">
+          <div class="ch" style="margin-bottom:5px;"><div class="ci b">🌡️</div><div class="ct">Percobaan 1 — Pengaruh Suhu</div></div>
+          <div id="labSteps1" style="display:flex;flex-direction:column;gap:4px;"></div>
+        </div>
+        <div class="card" style="margin-bottom:0;flex-shrink:0;">
+          <div class="ch" style="margin-bottom:5px;"><div class="ci b">💧</div><div class="ct">Percobaan 2 — Pengaruh Kelembapan</div></div>
+          <div id="labSteps2" style="display:flex;flex-direction:column;gap:4px;"></div>
+        </div>
+        <div class="card" style="margin-bottom:0;flex-shrink:0;">
+          <div class="ch" style="margin-bottom:5px;"><div class="ci b">🍅</div><div class="ct">Percobaan 3 — Jenis Substrat</div></div>
+          <div id="labSteps3" style="display:flex;flex-direction:column;gap:4px;"></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+        <div class="card" style="margin-bottom:0;flex-shrink:0;">
+          <div class="ch" style="margin-bottom:5px;"><div class="ci b">📋</div><div class="ct">Langkah Simulasi Virtual</div></div>
+          <div id="simStepsList" style="display:flex;flex-direction:column;gap:5px;"></div>
+        </div>
+        <div class="card" style="margin-bottom:0;border-color:rgba(220,38,38,.25);flex-shrink:0;">
+          <div class="ch" style="margin-bottom:5px;"><div class="ci r">⚠️</div><div class="ct" style="color:var(--red)">Perhatikan!</div></div>
+          <ul class="olist" style="font-size:11px;">
+            <li>Klik <strong>Berhenti</strong> sebelum mengubah kondisi percobaan</li>
+            <li>Klik <strong>Reset</strong> sebelum memulai percobaan baru</li>
+            <li><strong>Ubah satu variabel saja</strong> tiap percobaan agar valid</li>
+            <li>Catat setiap hasil di lembar kerja simulasi</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SIMULASI ══ -->
+<div id="page-simulasi" class="page">
+  <div style="flex:1;overflow:hidden;padding:8px 10px 8px;display:flex;gap:8px;">
+    <!-- PANEL KIRI -->
+    <div class="ctrl-panel" style="width:182px;flex-shrink:0;">
+      <h3>⚙️ Panel Kontrol</h3>
+      <div class="cg">
+        <label>Percobaan</label>
+        <select id="selPercobaan" onchange="onParamChange()">
+          <option value="suhu">🌡️ Pengaruh Suhu</option>
+          <option value="kelembapan">💧 Pengaruh Kelembapan</option>
+          <option value="substrat">🍅 Jenis Substrat</option>
+        </select>
+      </div>
+      <div class="cg" id="ctrlSuhu">
+        <label>Kondisi Suhu</label>
+        <select id="selSuhu" onchange="onParamChange()">
+          <option value="kulkas">❄️ Kulkas (~5°C)</option>
+          <option value="ruang" selected>🌡️ Suhu Ruang (~25°C)</option>
+          <option value="hangat">🔥 Hangat (~37°C)</option>
+        </select>
+      </div>
+      <div class="cg" id="ctrlKelembapan" style="display:none;">
+        <label>Kondisi Kelembapan</label>
+        <select id="selKelembapan" onchange="onParamChange()">
+          <option value="kering">🏜️ Kering</option>
+          <option value="sedang">🌤️ Sedang</option>
+          <option value="lembap" selected>💧 Lembap</option>
+        </select>
+      </div>
+      <div class="cg" id="ctrlSubstrat" style="display:none;">
+        <label>Jenis Substrat</label>
+        <select id="selSubstrat" onchange="onParamChange()">
+          <option value="roti" selected>🍞 Roti</option>
+          <option value="nasi">🍚 Nasi</option>
+          <option value="tomat">🍅 Tomat</option>
+        </select>
+      </div>
+      <button class="btn btn-start" id="btnStart" onclick="startSim()">▶ Mulai</button>
+      <button class="btn btn-stop" id="btnStop" onclick="stopSim()" disabled>⏹ Berhenti</button>
+      <button class="btn btn-reset" onclick="resetSim()">↺ Reset</button>
+      <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:7px;padding:8px;">
+        <div style="font-size:8.5px;font-weight:700;color:var(--acc);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;">💡 Keterangan</div>
+        <div style="font-size:10px;color:#92400e;line-height:1.55;" id="tipText">Pilih percobaan dan kondisi, lalu klik Mulai.</div>
+      </div>
+    </div>
+    <!-- AREA KANAN -->
+    <div style="flex:1;display:flex;flex-direction:column;gap:7px;overflow:hidden;min-width:0;">
+      <!-- HUD atas -->
+      <div class="hud-row" style="flex-shrink:0;">
+        <div class="hud-box"><span class="hud-val" id="statH">—</span><span class="hud-lbl">📅 Hari</span></div>
+        <div class="hud-box"><span class="hud-val" id="statG">—</span><span class="hud-lbl">🍄 Pertumbuhan</span></div>
+        <div class="hud-box" style="flex:2;"><span class="hud-val" style="font-size:clamp(10px,1.4vw,13px);" id="statS">—</span><span class="hud-lbl">⚙️ Kondisi</span></div>
+        <div class="sim-tab" id="hariTabs"></div>
+      </div>
+      <!-- Canvas -->
+      <div class="card" style="flex:1;margin-bottom:0;padding:0;overflow:hidden;min-height:0;border-radius:9px;">
+        <canvas id="simCanvas" style="width:100%;height:100%;display:block;background:#f0ebe0;"></canvas>
+      </div>
+      <!-- Lembar kerja -->
+      <div class="card" style="flex-shrink:0;overflow-x:auto;margin-bottom:0;max-height:130px;padding:7px 10px;">
+        <div class="ch" style="margin-bottom:4px;">
+          <div class="ci y">📊</div>
+          <div class="ct">Lembar Kerja Simulasi</div>
+          <button onclick="downloadSimPDF()" id="btnDownloadSim" style="margin-left:auto;background:linear-gradient(135deg,#b45309,#f59e0b);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:10px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:4px;touch-action:manipulation;white-space:nowrap;">⬇ Unduh PDF</button>
+        </div>
+        <table class="wstable">
+          <thead><tr><th>#</th><th>Percobaan</th><th>Kondisi</th><th>Hari 1</th><th>Hari 2</th><th>Hari 3</th><th>Rata-rata</th></tr></thead>
+          <tbody id="wsBody"><tr><td colspan="7" style="text-align:center;color:var(--text3);padding:10px;">Belum ada data — jalankan simulasi terlebih dahulu.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DISKUSI ══ -->
+<div id="page-diskusi" class="page">
+  <div style="flex:1;overflow:hidden;padding:8px 12px 8px;display:flex;flex-direction:column;gap:6px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:clamp(9px,1vw,11px);letter-spacing:.12em;color:var(--acc);text-transform:uppercase;">Pertanyaan Analisis &amp; Refleksi</div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:clamp(14px,2vw,19px);font-weight:700;color:var(--acc3);">Diskusi <span style="color:var(--acc2)">Hasil Percobaan</span></div>
+      </div>
+      <button onclick="clearDQ()" style="background:var(--surf2);border:1px solid var(--border);border-radius:6px;padding:5px 11px;font-size:11px;font-weight:600;color:var(--text2);cursor:pointer;touch-action:manipulation;">↺ Hapus</button>
+      <button onclick="downloadDiskusiPDF()" style="background:linear-gradient(135deg,#b45309,#f59e0b);color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;gap:4px;">⬇ Unduh PDF</button>
+    </div>
+    <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;gap:6px;padding-right:2px;">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;color:var(--acc);text-transform:uppercase;font-weight:700;">A. Pertanyaan Analisis</div>
+      <div class="two-col">
+        <div class="card" style="margin-bottom:0;display:flex;flex-direction:column;">
+          <div class="ch" style="margin-bottom:3px;"><div class="ci b" style="min-width:20px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;">1</div><div class="ct" style="font-size:clamp(11px,1.3vw,13px);">Pada kondisi suhu mana jamur tumbuh paling cepat? Mengapa?</div></div>
+          <textarea class="disc-area" placeholder="Tulis jawabanmu…" oninput="saveDQ(1,this.value)" style="flex:1;resize:none;margin-top:0;min-height:52px;"></textarea>
+        </div>
+        <div class="card" style="margin-bottom:0;display:flex;flex-direction:column;">
+          <div class="ch" style="margin-bottom:3px;"><div class="ci b" style="min-width:20px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;">2</div><div class="ct" style="font-size:clamp(11px,1.3vw,13px);">Mengapa jamur lebih cepat tumbuh pada kondisi lembap?</div></div>
+          <textarea class="disc-area" placeholder="Tulis jawabanmu…" oninput="saveDQ(2,this.value)" style="flex:1;resize:none;margin-top:0;min-height:52px;"></textarea>
+        </div>
+        <div class="card" style="margin-bottom:0;display:flex;flex-direction:column;">
+          <div class="ch" style="margin-bottom:3px;"><div class="ci b" style="min-width:20px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;">3</div><div class="ct" style="font-size:clamp(11px,1.3vw,13px);">Substrat mana yang paling cepat ditumbuhi jamur? Jelaskan!</div></div>
+          <textarea class="disc-area" placeholder="Tulis jawabanmu…" oninput="saveDQ(3,this.value)" style="flex:1;resize:none;margin-top:0;min-height:52px;"></textarea>
+        </div>
+        <div class="card" style="margin-bottom:0;display:flex;flex-direction:column;">
+          <div class="ch" style="margin-bottom:3px;"><div class="ci b" style="min-width:20px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;">4</div><div class="ct" style="font-size:clamp(11px,1.3vw,13px);">Apa hubungan hasil percobaan dengan cara penyimpanan makanan?</div></div>
+          <textarea class="disc-area" placeholder="Tulis jawabanmu…" oninput="saveDQ(4,this.value)" style="flex:1;resize:none;margin-top:0;min-height:52px;"></textarea>
+        </div>
+        <div class="card" style="margin-bottom:0;display:flex;flex-direction:column;">
+          <div class="ch" style="margin-bottom:3px;"><div class="ci b" style="min-width:20px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;">5</div><div class="ct" style="font-size:clamp(11px,1.3vw,13px);">Bagaimana cara menghambat pertumbuhan jamur yang efektif?</div></div>
+          <textarea class="disc-area" placeholder="Tulis jawabanmu…" oninput="saveDQ(5,this.value)" style="flex:1;resize:none;margin-top:0;min-height:52px;"></textarea>
+        </div>
+        <div class="card" style="margin-bottom:0;display:flex;flex-direction:column;">
+          <div class="ch" style="margin-bottom:3px;"><div class="ci b" style="min-width:20px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;">6</div><div class="ct" style="font-size:clamp(11px,1.3vw,13px);">Apa yang terjadi jika suhu terlalu rendah atau terlalu tinggi?</div></div>
+          <textarea class="disc-area" placeholder="Tulis jawabanmu…" oninput="saveDQ(6,this.value)" style="flex:1;resize:none;margin-top:0;min-height:52px;"></textarea>
+        </div>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;color:var(--acc);text-transform:uppercase;font-weight:700;">B. Kesimpulan</div>
+      <div class="card" style="margin-bottom:0;">
+        <div class="ch" style="margin-bottom:3px;"><div class="ci y">✍️</div><div class="ct">Tuliskan Kesimpulan</div></div>
+        <textarea class="disc-area" placeholder="Berdasarkan percobaan yang telah dilakukan, dapat disimpulkan bahwa…" oninput="saveDQ(7,this.value)" style="resize:vertical;min-height:65px;"></textarea>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;color:var(--acc);text-transform:uppercase;font-weight:700;">C. Refleksi</div>
+      <div class="card" style="margin-bottom:0;">
+        <div class="ch" style="margin-bottom:3px;"><div class="ci g">🌱</div><div class="ct">Apa yang Kamu Pelajari?</div></div>
+        <textarea class="disc-area" placeholder="Setelah melakukan praktikum ini, saya mempelajari bahwa…" oninput="saveDQ(8,this.value)" style="resize:vertical;min-height:58px;"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- #app -->
+
+<script>
+/* ══ NAV ══ */
+function toggleNav(){document.getElementById('mainNav').classList.toggle('open');}
+function closeNav(){document.getElementById('mainNav').classList.remove('open');}
+document.addEventListener('pointerdown',e=>{
+  if(!e.target.closest('nav')&&!e.target.closest('#menuToggle')) closeNav();
+},{passive:true});
+function show(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='simulasi') setTimeout(()=>{resizeCanvas();regen();drawScene();},50);
+}
+
+/* ══ PROSEDUR DATA ══ */
+const labSteps1=[
+  {icon:'<img src="https://i.ibb.co.com/xS0KHcdN/Roti.png" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;" alt="">',text:'Siapkan 3 sampel roti dengan ukuran sama.'},
+  {icon:'<img src="https://i.ibb.co.com/G4vKy2yj/Label-Spidol.png" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;" alt="">',text:'Beri label: Kulkas, Suhu Ruang, Tempat Hangat.'},
+  {icon:'<img src="https://i.ibb.co.com/8QjfW2L/Wadah-Tertutup.png" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;" alt="">',text:'Masukkan tiap sampel ke wadah tertutup terpisah.'},
+  {icon:'<img src="https://i.ibb.co.com/NdCvVd4w/Kulkas.png" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;" alt="">',text:'Simpan sesuai kondisi suhu masing-masing.'},
+  {icon:'<img src="https://i.ibb.co.com/nNrKm27J/Lup.png" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;" alt="">',text:'Amati setiap hari selama 3–5 hari.'},
+  {icon:'📝',text:'Catat warna, tekstur, dan luas area pertumbuhan.'},
+];
+const labSteps2=[
+  {icon:'<img src="https://i.ibb.co.com/xS0KHcdN/Roti.png" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;" alt="">',text:'Siapkan 2 sampel roti dengan ukuran sama.'},
+  {icon:'<img src="https://i.ibb.co.com/93cbmbd0/Air.png" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;" alt="">',text:'Teteskan sedikit air pada satu sampel (kondisi lembap).'},
+  {icon:'<img src="https://i.ibb.co.com/8QjfW2L/Wadah-Tertutup.png" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;" alt="">',text:'Tutup rapat kedua wadah, simpan di tempat yang sama.'},
+  {icon:'<img src="https://i.ibb.co.com/nNrKm27J/Lup.png" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;" alt="">',text:'Amati setiap hari selama 3–5 hari.'},
+  {icon:'📝',text:'Catat perbedaan pertumbuhan pada kedua kondisi.'},
+];
+const labSteps3=[
+  {icon:'<img src="https://i.ibb.co.com/xS0KHcdN/Roti.png" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;" alt="">',text:'Siapkan tiga substrat: roti, nasi, dan tomat.'},
+  {icon:'<img src="https://i.ibb.co.com/8QjfW2L/Wadah-Tertutup.png" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;" alt="">',text:'Masukkan masing-masing ke wadah tertutup terpisah.'},
+  {icon:'<img src="https://i.ibb.co.com/LXWFvqzL/Termometer.png" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;" alt="">',text:'Simpan semua pada kondisi yang sama (suhu ruang, lembap).'},
+  {icon:'<img src="https://i.ibb.co.com/nNrKm27J/Lup.png" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;" alt="">',text:'Amati setiap hari selama 3–5 hari.'},
+  {icon:'📝',text:'Bandingkan kecepatan tumbuh hifa pada tiap substrat.'},
+];
+const simSteps=[
+  {icon:'⚙️',text:'Pilih <strong>Percobaan</strong> yang ingin dijalankan.'},
+  {icon:'🎛️',text:'Atur kondisi variabel (suhu / kelembapan / substrat).'},
+  {icon:'▶️',text:'Klik <strong>▶ Mulai</strong> dan amati animasi pertumbuhan hifa.'},
+  {icon:'📅',text:'Gunakan tab <strong>Hari 1–3</strong> untuk melihat perkembangan hifa.'},
+  {icon:'⏹️',text:'Klik <strong>⏹ Berhenti</strong> untuk menjeda simulasi.'},
+  {icon:'📝',text:'Data tercatat otomatis di <strong>Lembar Kerja Simulasi</strong>.'},
+  {icon:'↺',text:'Klik <strong>↺ Reset</strong> lalu ubah kondisi untuk percobaan berikutnya.'},
+];
+
+function buildLabSteps(data,id){
+  document.getElementById(id).innerHTML=data.map((s,i)=>`
+    <div class="step">
+      <div class="snum">${i+1}</div>
+      <p><span style="font-size:13px;margin-right:4px;">${s.icon}</span>${s.text}</p>
+    </div>`).join('');
+}
+function buildSimSteps(data,id){
+  const clrs=['#d97706','#f59e0b','#ea580c','#b45309','#f97316','#c2410c','#92400e'];
+  document.getElementById(id).innerHTML=`<div style="position:relative;padding:2px 0;">
+    ${data.map((s,i)=>{
+      const c=clrs[i%clrs.length],nc=clrs[(i+1)%clrs.length],last=i===data.length-1,isR=i%2===0;
+      return `<div style="display:flex;align-items:flex-start;gap:0;position:relative;" class="map-step">
+        ${isR?`
+        <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;z-index:1;margin-right:8px;">
+          <button onclick="zoomStep(this)" style="width:34px;height:34px;border-radius:50%;background:${c};border:none;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 7px ${c}55;cursor:pointer;padding:0;font-size:14px;touch-action:manipulation;-webkit-appearance:none;">${s.icon}</button>
+          ${!last?`<div style="width:0;flex:1;min-height:10px;border-left:2px dashed ${nc}80;margin:2px 0;"></div>`:''}
+        </div>
+        <div style="flex:1;background:${c}10;border:1.5px solid ${c}28;border-radius:8px;padding:5px 8px;margin-bottom:0;" class="step-box">
+          <div style="font-size:8px;font-weight:700;color:${c};letter-spacing:.1em;text-transform:uppercase;margin-bottom:1px;">Langkah ${i+1}</div>
+          <p style="font-size:clamp(10px,1.1vw,12px);color:var(--text2);margin:0;line-height:1.5;">${s.text}</p>
+        </div>`:`
+        <div style="flex:1;background:${c}10;border:1.5px solid ${c}28;border-radius:8px;padding:5px 8px;margin-bottom:0;" class="step-box">
+          <div style="font-size:8px;font-weight:700;color:${c};letter-spacing:.1em;text-transform:uppercase;margin-bottom:1px;">Langkah ${i+1}</div>
+          <p style="font-size:clamp(10px,1.1vw,12px);color:var(--text2);margin:0;line-height:1.5;">${s.text}</p>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;z-index:1;margin-left:8px;">
+          <button onclick="zoomStep(this)" style="width:34px;height:34px;border-radius:50%;background:${c};border:none;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 7px ${c}55;cursor:pointer;padding:0;font-size:14px;touch-action:manipulation;-webkit-appearance:none;">${s.icon}</button>
+          ${!last?`<div style="width:0;flex:1;min-height:10px;border-left:2px dashed ${nc}80;margin:2px 0;"></div>`:''}
+        </div>`}
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+function zoomStep(btn){
+  const b=btn.closest('.map-step')?.querySelector('.step-box');if(!b)return;
+  b.classList.remove('step-box-zoom');void b.offsetWidth;b.classList.add('step-box-zoom');
+  b.addEventListener('animationend',()=>b.classList.remove('step-box-zoom'),{once:true});
+}
+
+/* ══ DRAG & DROP — full pointer events ══ */
+const CORRECT_ALAT=new Set(['wadah','label','kulkas','termometer','lup','stopwatch']);
+const CORRECT_BAHAN=new Set(['roti','nasi','tomat','air']);
+let _sel=null,_ghost=null,_ox=0,_oy=0;
+
+function _mkGhost(el,cx,cy){
+  const r=el.getBoundingClientRect();_ox=cx-r.left;_oy=cy-r.top;
+  _ghost=el.cloneNode(true);
+  Object.assign(_ghost.style,{position:'fixed',left:(cx-_ox)+'px',top:(cy-_oy)+'px',
+    width:r.width+'px',pointerEvents:'none',zIndex:'9999',opacity:'.87',
+    transform:'rotate(3deg) scale(1.06)',transition:'none'});
+  document.body.appendChild(_ghost);
+}
+function _mvGhost(cx,cy){if(_ghost){_ghost.style.left=(cx-_ox)+'px';_ghost.style.top=(cy-_oy)+'px';}}
+function _rmGhost(){if(_ghost){_ghost.remove();_ghost=null;}}
+function _hit(el,cx,cy){const r=el.getBoundingClientRect();return cx>=r.left&&cx<=r.right&&cy>=r.top&&cy<=r.bottom;}
+function _flash(zone,ok){zone.style.boxShadow=ok?'0 0 0 3px rgba(5,150,105,.45)':'0 0 0 3px rgba(220,38,38,.45)';setTimeout(()=>zone.style.boxShadow='',900);}
+
+function _place(zone,src){
+  const id=src.dataset.id;
+  const hintId=zone.id==='drop-alat'?'drop-alat-hint':'drop-bahan-hint';
+  const cs=zone.id==='drop-alat'?CORRECT_ALAT:CORRECT_BAHAN;
+  if(zone.querySelector(`[data-id="${id}"]`)) return;
+  if(!cs.has(id)){_flash(zone,false);return;}
+  const h=document.getElementById(hintId);if(h)h.style.display='none';
+  const cl=src.cloneNode(true);
+  cl.style.cssText='cursor:default;position:relative;transform:scale(.85);transition:transform .18s;';
+  requestAnimationFrame(()=>{cl.style.transform='scale(1)';});
+  const rm=document.createElement('button');
+  rm.textContent='✕';
+  Object.assign(rm.style,{position:'absolute',top:'2px',right:'2px',background:'rgba(220,38,38,.18)',
+    border:'none',borderRadius:'50%',width:'22px',height:'22px',fontSize:'11px',cursor:'pointer',
+    color:'#dc2626',display:'flex',alignItems:'center',justifyContent:'center',padding:'0',touchAction:'manipulation'});
+  rm.addEventListener('pointerdown',e=>e.stopPropagation());
+  rm.addEventListener('click',e=>{
+    e.stopPropagation();cl.remove();
+    if(!zone.querySelector('[data-id]')){const h2=document.getElementById(hintId);if(h2)h2.style.display='';}
+  });
+  cl.appendChild(rm);zone.appendChild(cl);
+  _flash(zone,true);_checkAll();
+}
+function _checkAll(){
+  if(document.querySelectorAll('#drop-alat [data-id]').length>=CORRECT_ALAT.size &&
+     document.querySelectorAll('#drop-bahan [data-id]').length>=CORRECT_BAHAN.size)
+    setTimeout(_selamat,400);
+}
+function _selamat(){
+  if(document.querySelector('.selamat-ov')) return;
+  const ov=document.createElement('div');ov.className='selamat-ov';
+  Object.assign(ov.style,{position:'fixed',inset:'0',zIndex:'9998',background:'rgba(0,0,0,.48)',
+    display:'flex',alignItems:'center',justifyContent:'center',animation:'fadeIn .3s ease'});
+  const bx=document.createElement('div');
+  Object.assign(bx.style,{background:'#fff',borderRadius:'18px',padding:'28px 36px',textAlign:'center',
+    maxWidth:'330px',boxShadow:'0 16px 48px rgba(0,0,0,.25)',animation:'popIn .4s cubic-bezier(.34,1.56,.64,1)',
+    fontFamily:'Space Grotesk,sans-serif'});
+  bx.innerHTML=`<div style="font-size:46px;margin-bottom:8px;">🎉</div>
+    <div style="font-size:17px;font-weight:800;color:#d97706;margin-bottom:6px;">Selamat!</div>
+    <div style="font-size:12.5px;color:#374151;line-height:1.6;margin-bottom:16px;">Semua alat dan bahan berhasil disusun!<br>Lanjutkan ke <strong>Prosedur</strong>.</div>
+    <button onclick="this.closest('.selamat-ov').remove();document.querySelectorAll('.nb')[2].click();"
+      style="background:linear-gradient(135deg,#d97706,#f59e0b);color:#fff;border:none;border-radius:9px;padding:8px 22px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:Space Grotesk,sans-serif;touch-action:manipulation;-webkit-appearance:none;">
+      📋 Lihat Prosedur →</button>`;
+  ov.appendChild(bx);document.body.appendChild(ov);
+  ov.addEventListener('pointerdown',e=>{if(e.target===ov)ov.remove();});
+}
+function _attachDrag(el){
+  el.addEventListener('pointerdown',e=>{
+    if(e.target.tagName==='BUTTON') return;
+    e.preventDefault();el.setPointerCapture(e.pointerId);
+    _sel=el;el.style.opacity='.35';el.style.transform='scale(.95)';
+    _mkGhost(el,e.clientX,e.clientY);
+    ['drop-alat','drop-bahan'].forEach(id=>{
+      const z=document.getElementById(id);
+      if(z){z.style.borderStyle='solid';z.style.borderWidth='2.5px';}
+    });
+  },{passive:false});
+  el.addEventListener('pointermove',e=>{
+    if(_sel!==el) return;e.preventDefault();_mvGhost(e.clientX,e.clientY);
+    ['drop-alat','drop-bahan'].forEach(id=>{
+      const z=document.getElementById(id);if(!z)return;
+      if(_hit(z,e.clientX,e.clientY)){z.style.background=id==='drop-alat'?'#fffbeb':'#dcfce7';z.style.transform='scale(1.02)';}
+      else{z.style.background='';z.style.transform='';}
+    });
+  },{passive:false});
+  el.addEventListener('pointerup',e=>{
+    if(_sel!==el) return;e.preventDefault();
+    el.style.opacity='1';el.style.transform='';_rmGhost();
+    ['drop-alat','drop-bahan'].forEach(id=>{
+      const z=document.getElementById(id);if(!z)return;
+      z.style.background='';z.style.transform='';z.style.borderStyle='';z.style.borderWidth='';
+      if(_hit(z,e.clientX,e.clientY)) _place(z,el);
+    });
+    _sel=null;
+  },{passive:false});
+  el.addEventListener('pointercancel',()=>{
+    if(_sel===el){el.style.opacity='1';el.style.transform='';}
+    _rmGhost();_sel=null;
+    ['drop-alat','drop-bahan'].forEach(id=>{
+      const z=document.getElementById(id);if(!z)return;
+      z.style.background='';z.style.transform='';z.style.borderStyle='';z.style.borderWidth='';
+    });
+  });
+}
+
+/* ══ SIMULASI ══ */
+const canvas=document.getElementById('simCanvas');
+const ctx=canvas.getContext('2d');
+let isRunning=false,currentDay=1,timerInt=null,wsRows=[];
+let hifas=[];
+
+const growthData={
+  suhu:       {kulkas:[5,10,14],   ruang:[38,68,92],   hangat:[18,38,54]},
+  kelembapan: {kering:[4,8,12],    sedang:[22,44,68],   lembap:[42,76,96]},
+  substrat:   {roti:[30,62,86],    nasi:[24,52,76],     tomat:[42,80,98]}
+};
+const tips={
+  suhu:{
+    kulkas:'Suhu kulkas (~5°C) menghambat aktivitas enzim. Hifa hampir tidak tumbuh.',
+    ruang:'Suhu ruang (~25°C) adalah kondisi optimal. Hifa tumbuh dan menyebar dengan cepat.',
+    hangat:'Suhu ~37°C mulai merusak enzim. Pertumbuhan hifa lebih lambat dari suhu ruang.'
+  },
+  kelembapan:{
+    kering:'Kondisi kering menghambat perkecambahan spora. Hifa tidak dapat tumbuh tanpa air.',
+    sedang:'Kelembapan sedang cukup mendukung pertumbuhan, namun tidak seoptimal kondisi lembap.',
+    lembap:'Kelembapan tinggi menyediakan air yang cukup — spora berkecambah dan hifa menyebar cepat.'
+  },
+  substrat:{
+    roti:'Roti kaya pati (karbohidrat kompleks). Jamur dapat mencernanya dengan baik.',
+    nasi:'Nasi mengandung pati dengan kadar air lebih rendah. Pertumbuhan lebih lambat dari tomat.',
+    tomat:'Tomat kaya gula sederhana dan air — substrat paling ideal, hifa menyebar paling cepat.'
+  }
+};
+const labelMap={
+  suhu:{kulkas:'❄️ Kulkas',ruang:'🌡️ Suhu Ruang',hangat:'🔥 Hangat'},
+  kelembapan:{kering:'🏜️ Kering',sedang:'🌤️ Sedang',lembap:'💧 Lembap'},
+  substrat:{roti:'🍞 Roti',nasi:'🍚 Nasi',tomat:'🍅 Tomat'}
+};
+const percNama={suhu:'Pengaruh Suhu',kelembapan:'Pengaruh Kelembapan',substrat:'Jenis Substrat'};
+
+function getP(){return document.getElementById('selPercobaan').value;}
+function getK(){
+  const p=getP();
+  return document.getElementById(p==='suhu'?'selSuhu':p==='kelembapan'?'selKelembapan':'selSubstrat').value;
+}
+function getGrowth(day){return growthData[getP()][getK()][Math.min(day,3)-1]||0;}
+function getLabel(){return(labelMap[getP()]||{})[getK()]||getK();}
+
+function onParamChange(){
+  const p=getP();
+  document.getElementById('ctrlSuhu').style.display=p==='suhu'?'':'none';
+  document.getElementById('ctrlKelembapan').style.display=p==='kelembapan'?'':'none';
+  document.getElementById('ctrlSubstrat').style.display=p==='substrat'?'':'none';
+  const k=getK();
+  document.getElementById('tipText').textContent=(tips[p]&&tips[p][k])||'Pilih kondisi dan klik Mulai.';
+  if(!isRunning){regen();drawScene();}
+}
+
+function resizeCanvas(){
+  canvas.width=canvas.offsetWidth||300;
+  canvas.height=canvas.offsetHeight||220;
+}
+
+/* Deterministic pseudo-random for reproducible hifa patterns */
+function mkRand(seed){
+  let s=seed|0;
+  return()=>{s=(s*16807+0)%2147483647;return(s-1)/2147483646;};
+}
+
+/* Generate hifa network */
+function regen(){hifas=[];genHifas(getGrowth(currentDay));}
+function genHifas(pct){
+  hifas=[];if(pct<=0)return;
+  const W=canvas.width,H=canvas.height;
+  const R=Math.min(W,H)*0.355;
+  const cx=W*0.5,cy=H*0.5;
+  const rand=mkRand(pct*41+currentDay*17);
+  const nMain=Math.max(3,Math.floor(pct*0.6));
+  for(let i=0;i<nMain;i++){
+    const a=rand()*Math.PI*2;
+    const r0=(0.02+rand()*0.18)*R*(pct/100);
+    const sx=cx+Math.cos(a)*r0,sy=cy+Math.sin(a)*r0;
+    const dir=rand()*Math.PI*2;
+    const len=R*(0.12+rand()*0.55*(pct/100));
+    growThread(rand,sx,sy,dir,len,Math.floor(3+rand()*5),0,cx,cy,R);
+  }
+}
+function growThread(rand,sx,sy,dir,maxLen,segs,depth,cx,cy,R){
+  if(depth>4||maxLen<3)return;
+  let x=sx,y=sy,rem=maxLen;
+  const pts=[[x,y]];
+  for(let s=0;s<segs&&rem>2;s++){
+    dir+=(rand()-.5)*0.85;
+    const sl=Math.min(rem,5+rand()*16*(1-depth*0.18));
+    x+=Math.cos(dir)*sl;y+=Math.sin(dir)*sl;
+    const d=Math.hypot(x-cx,y-cy);
+    if(d>R*0.94){const a2=Math.atan2(y-cy,x-cx);x=cx+Math.cos(a2)*R*0.93;y=cy+Math.sin(a2)*R*0.93;}
+    pts.push([x,y]);rem-=sl;
+    if(depth<4&&rand()<0.38&&sl>5){
+      const bd=dir+(rand()>.5?1:-1)*(0.4+rand()*0.75);
+      growThread(rand,x,y,bd,rem*0.5,Math.floor(segs*0.6),depth+1,cx,cy,R);
+    }
+  }
+  const hasTip=depth<=1&&rand()<0.5;
+  hifas.push({pts,depth,tip:hasTip,tx:x,ty:y});
+}
+
+function drawScene(){
+  resizeCanvas();
+  const W=canvas.width,H=canvas.height;
+  const pct=getGrowth(currentDay);
+  const p=getP(),k=getK();
+
+  ctx.clearRect(0,0,W,H);
+
+  /* --- Lab bench background --- */
+  const bgG=ctx.createLinearGradient(0,0,0,H);
+  bgG.addColorStop(0,'#f6efe2');bgG.addColorStop(1,'#e8d9c0');
+  ctx.fillStyle=bgG;ctx.fillRect(0,0,W,H);
+
+  /* --- 2D flat petri dish circle --- */
+  const R=Math.min(W*0.42,H*0.41);
+  const cx=W*0.5,cy=H*0.5;
+
+  // outer rim shadow
+  ctx.save();
+  ctx.shadowColor='rgba(100,60,10,0.18)';ctx.shadowBlur=12;ctx.shadowOffsetY=4;
+  ctx.beginPath();ctx.arc(cx,cy,R+3,0,Math.PI*2);
+  ctx.fillStyle='rgba(160,120,55,0.35)';ctx.fill();
+  ctx.restore();
+
+  // agar substrate fill
+  const agarColors={roti:'#f4e5bf',nasi:'#ede9d0',tomat:'#fde0c8'};
+  const agarBase=(p==='substrat'?agarColors[k]:undefined)||'#f2e9d5';
+  ctx.save();
+  ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);
+  const agarG=ctx.createRadialGradient(cx,cy,0,cx,cy,R);
+  agarG.addColorStop(0,'#fffdf6');agarG.addColorStop(0.55,agarBase);agarG.addColorStop(1,'#d4bf98');
+  ctx.fillStyle=agarG;ctx.fill();
+  ctx.strokeStyle='rgba(150,110,50,0.45)';ctx.lineWidth=2;ctx.stroke();
+  ctx.restore();
+
+  // inner concentric ring (petri dish look)
+  ctx.save();
+  ctx.beginPath();ctx.arc(cx,cy,R*0.88,0,Math.PI*2);
+  ctx.strokeStyle='rgba(180,140,70,0.10)';ctx.lineWidth=6;ctx.stroke();
+  ctx.restore();
+
+  // mycelium coverage glow
+  if(pct>5){
+    const cR=R*Math.sqrt(pct/100)*0.92;
+    const myG=ctx.createRadialGradient(cx,cy,0,cx,cy,cR);
+    myG.addColorStop(0,'rgba(255,255,255,0.82)');
+    myG.addColorStop(0.45,'rgba(242,240,228,0.55)');
+    myG.addColorStop(1,'rgba(220,215,195,0)');
+    ctx.save();
+    ctx.beginPath();ctx.arc(cx,cy,R-1,0,Math.PI*2);ctx.clip();
+    ctx.beginPath();ctx.arc(cx,cy,cR,0,Math.PI*2);ctx.fillStyle=myG;ctx.fill();
+    ctx.restore();
+  }
+
+  // hifa threads (microscopic filaments)
+  if(hifas.length){
+    ctx.save();
+    ctx.beginPath();ctx.arc(cx,cy,R-1,0,Math.PI*2);ctx.clip();
+    hifas.forEach(h=>{
+      if(h.pts.length<2)return;
+      const lw=Math.max(0.5,1.7-h.depth*0.42);
+      const alpha=0.50+Math.max(0,(2-h.depth)*0.08);
+      ctx.beginPath();
+      ctx.moveTo(h.pts[0][0],h.pts[0][1]);
+      for(let i=1;i<h.pts.length;i++) ctx.lineTo(h.pts[i][0],h.pts[i][1]);
+      ctx.strokeStyle=`rgba(185,172,142,${alpha})`;
+      ctx.lineWidth=lw;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();
+      // sporangia at thread tips
+      if(h.tip&&pct>12){
+        const sc=pct>65?'rgba(28,12,0,0.85)':pct>35?'rgba(75,35,5,0.80)':'rgba(135,75,18,0.72)';
+        ctx.beginPath();ctx.arc(h.tx,h.ty,1.8+pct/80,0,Math.PI*2);ctx.fillStyle=sc;ctx.fill();
+      }
+    });
+    ctx.restore();
+  }
+
+  // rim highlight
+  ctx.save();
+  ctx.beginPath();ctx.arc(cx-R*0.28,cy-R*0.28,R*0.16,Math.PI*1.05,Math.PI*1.82);
+  ctx.strokeStyle='rgba(255,255,255,0.30)';ctx.lineWidth=4;ctx.stroke();
+  ctx.restore();
+
+  /* --- Progress bar (top, inside canvas) --- */
+  const bX=W*0.06,bY=8,bW=W*0.88,bH=7;
+  ctx.save();
+  // track
+  ctx.fillStyle='rgba(0,0,0,0.10)';
+  roundRect(ctx,bX,bY,bW,bH,4);ctx.fill();
+  // fill
+  if(pct>0){
+    const bG=ctx.createLinearGradient(bX,0,bX+bW,0);
+    bG.addColorStop(0,'#f59e0b');bG.addColorStop(1,'#059669');
+    ctx.fillStyle=bG;
+    roundRect(ctx,bX,bY,Math.max(bH,bW*(pct/100)),bH,4);ctx.fill();
+    // pct label on bar
+    ctx.fillStyle='rgba(30,15,0,0.65)';
+    ctx.font=`600 ${Math.max(8,Math.min(bH-1,11))}px Inter,sans-serif`;
+    ctx.textAlign='right';ctx.textBaseline='middle';
+    ctx.fillText(pct+'%',bX+bW-3,bY+bH/2);
+  }
+  ctx.restore();
+
+  /* --- Label strip (bottom, does not overlap dish) --- */
+  // Position strip below dish
+  const stripTop=Math.min(H-30, cy+R+8);
+  const stripH=Math.max(20,H-stripTop-4);
+  if(stripTop+stripH<=H){
+    ctx.save();
+    ctx.fillStyle='rgba(40,22,4,0.62)';
+    roundRect(ctx,W*0.05,stripTop,W*0.90,stripH,6);ctx.fill();
+    const fs=Math.max(9,Math.min(W/28,13));
+    ctx.font=`600 ${fs}px Inter,sans-serif`;
+    ctx.textBaseline='middle';
+    const midY=stripTop+stripH/2;
+    const seg=W*0.90/3;
+    ctx.textAlign='center';
+    ctx.fillStyle='#fde68a';ctx.fillText(`Hari ${currentDay}/3`,W*0.05+seg*0.5,midY);
+    ctx.fillStyle='#ffffff';ctx.fillText(getLabel(),W*0.05+seg*1.5,midY);
+    ctx.fillStyle='#86efac';ctx.fillText(`${pct}% hifa`,W*0.05+seg*2.5,midY);
+    ctx.restore();
+  }
+
+  /* --- Update external HUD --- */
+  document.getElementById('statH').textContent='Hari '+currentDay;
+  document.getElementById('statG').textContent=pct+'%';
+  document.getElementById('statS').textContent=getLabel();
+}
+
+/* roundRect polyfill */
+function roundRect(ctx,x,y,w,h,r){
+  if(ctx.roundRect){ctx.beginPath();ctx.roundRect(x,y,w,h,r);return;}
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);
+  ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();
+}
+
+/* ── Hari Tabs ── */
+function buildTabs(){
+  const c=document.getElementById('hariTabs');c.innerHTML='';
+  for(let d=1;d<=3;d++){
+    const btn=document.createElement('button');
+    btn.className='stab'+(d===currentDay?' active':'');
+    btn.textContent='Hari '+d;
+    btn.style.touchAction='manipulation';
+    btn.addEventListener('click',(()=>{const day=d;return()=>{
+      currentDay=day;
+      document.querySelectorAll('#hariTabs .stab').forEach((b,i)=>b.classList.toggle('active',i+1===day));
+      regen();drawScene();updateTip();
+    };})());
+    c.appendChild(btn);
+  }
+}
+function updateTip(){
+  const p=getP(),k=getK();
+  document.getElementById('tipText').textContent=(tips[p]&&tips[p][k])||'Pilih kondisi dan klik Mulai.';
+}
+function addWsRow(){
+  const p=getP(),k=getK(),d=growthData[p][k];
+  const avg=Math.round((d[0]+d[1]+d[2])/3);
+  wsRows.push({perc:percNama[p],kondisi:getLabel(),d1:d[0],d2:d[1],d3:d[2],avg});
+  document.getElementById('wsBody').innerHTML=wsRows.map((r,i)=>`
+    <tr><td>${i+1}</td><td>${r.perc}</td><td>${r.kondisi}</td><td>${r.d1}%</td><td>${r.d2}%</td><td>${r.d3}%</td><td><strong>${r.avg}%</strong></td></tr>
+  `).join('');
+}
+function startSim(){
+  if(isRunning)return;
+  isRunning=true;
+  document.getElementById('btnStart').disabled=true;
+  document.getElementById('btnStop').disabled=false;
+  currentDay=1;buildTabs();regen();drawScene();updateTip();
+  let tick=0;
+  timerInt=setInterval(()=>{
+    tick++;
+    if(tick%3===0&&currentDay<3){
+      currentDay++;
+      document.querySelectorAll('#hariTabs .stab').forEach((b,i)=>b.classList.toggle('active',i+1===currentDay));
+      regen();updateTip();
+    }
+    if(tick>=9){
+      clearInterval(timerInt);timerInt=null;isRunning=false;
+      document.getElementById('btnStart').disabled=false;
+      document.getElementById('btnStop').disabled=true;
+      addWsRow();
+    }
+    drawScene();
+  },1000);
+}
+function stopSim(){
+  if(!isRunning)return;
+  clearInterval(timerInt);timerInt=null;isRunning=false;
+  document.getElementById('btnStart').disabled=false;
+  document.getElementById('btnStop').disabled=true;
+}
+function resetSim(){
+  stopSim();currentDay=1;hifas=[];
+  document.getElementById('hariTabs').innerHTML='';
+  resizeCanvas();onParamChange();
+}
+
+/* ══ DISKUSI ══ */
+const dqData={};
+function saveDQ(n,v){dqData[n]=v;}
+function clearDQ(){
+  Object.keys(dqData).forEach(k=>delete dqData[k]);
+  document.querySelectorAll('.disc-area').forEach(el=>el.value='');
+}
+
+/* ══ DOWNLOAD PDF SIMULASI (landscape) ══ */
+function downloadSimPDF(){
+  const rows=wsRows;
+  if(!rows||rows.length===0){alert('Belum ada data simulasi. Jalankan simulasi terlebih dahulu.');return;}
+  const w=window.open('','_blank');
+  if(!w){alert('Pop-up diblokir. Izinkan pop-up untuk mengunduh PDF.');return;}
+  const now=new Date();
+  const tgl=now.toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'});
+  const rowsHTML=rows.map((r,i)=>`
+    <tr>
+      <td style="text-align:center;">${i+1}</td>
+      <td>${r.perc}</td>
+      <td>${r.kondisi}</td>
+      <td style="text-align:center;">${r.d1}%</td>
+      <td style="text-align:center;">${r.d2}%</td>
+      <td style="text-align:center;">${r.d3}%</td>
+      <td style="text-align:center;font-weight:700;">${r.avg}%</td>
+    </tr>`).join('');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <title>Lembar Kerja Simulasi – Jamur</title>
+  <style>
+    @page{size:A4 landscape;margin:18mm 20mm;}
+    body{font-family:'Arial',sans-serif;color:#1e293b;margin:0;}
+    h1{font-size:17px;color:#b45309;margin-bottom:2px;}
+    .sub{font-size:11px;color:#64748b;margin-bottom:14px;}
+    table{width:100%;border-collapse:collapse;font-size:12px;}
+    th{background:#fffbeb;color:#92400e;padding:8px 10px;border:1px solid #fcd34d;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;}
+    td{padding:7px 10px;border:1px solid #e2e8f0;color:#334155;}
+    tr:nth-child(even) td{background:#fffbf5;}
+    .footer{margin-top:16px;font-size:10px;color:#94a3b8;border-top:1px solid #e2e8f0;padding-top:8px;display:flex;justify-content:space-between;}
+    .badge{display:inline-block;background:#fffbeb;border:1px solid #fcd34d;border-radius:4px;padding:2px 8px;font-size:10px;color:#b45309;margin-bottom:10px;}
+  </style></head><body>
+  <div class="badge">🍄 Lab Maya Biologi – Jamur (Fungi) · Kelas X SMA</div>
+  <h1>📊 Lembar Kerja Simulasi</h1>
+  <div class="sub">Percobaan Pertumbuhan Jamur &nbsp;|&nbsp; Dicetak: ${tgl}</div>
+  <table>
+    <thead><tr><th>#</th><th>Percobaan</th><th>Kondisi</th><th>Hari 1</th><th>Hari 2</th><th>Hari 3</th><th>Rata-rata</th></tr></thead>
+    <tbody>${rowsHTML}</tbody>
+  </table>
+  <div class="footer">
+    <span>Lab Maya Biologi – Jamur (Fungi)</span>
+    <span>Nama: _________________________ &nbsp;&nbsp; Kelas: _____________</span>
+  </div>
+  <script>window.onload=()=>{window.print();}<\/script>
+  </body></html>`);
+  w.document.close();
+}
+
+/* ══ DOWNLOAD PDF DISKUSI (portrait) ══ */
+function downloadDiskusiPDF(){
+  const pertanyaan=[
+    'Pada kondisi suhu mana jamur tumbuh paling cepat? Mengapa?',
+    'Mengapa jamur lebih cepat tumbuh pada kondisi lembap?',
+    'Substrat mana yang paling cepat ditumbuhi jamur? Jelaskan!',
+    'Apa hubungan hasil percobaan dengan cara penyimpanan makanan?',
+    'Bagaimana cara menghambat pertumbuhan jamur yang efektif?',
+    'Apa yang terjadi jika suhu terlalu rendah atau terlalu tinggi?'
+  ];
+  const w=window.open('','_blank');
+  if(!w){alert('Pop-up diblokir. Izinkan pop-up untuk mengunduh PDF.');return;}
+  const now=new Date();
+  const tgl=now.toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'});
+  const analisisHTML=pertanyaan.map((q,i)=>`
+    <div style="margin-bottom:14px;">
+      <div style="font-size:11px;font-weight:700;color:#b45309;margin-bottom:4px;">${i+1}. ${q}</div>
+      <div style="border:1px solid #e2e8f0;border-radius:5px;padding:8px 10px;min-height:48px;font-size:12px;color:#334155;background:#fffbf5;line-height:1.65;">
+        ${(dqData[i+1]||'').replace(/\n/g,'<br>')||'<span style="color:#94a3b8;font-style:italic;">(belum diisi)</span>'}
+      </div>
+    </div>`).join('');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <title>Diskusi Hasil Percobaan – Jamur</title>
+  <style>
+    @page{size:A4 portrait;margin:18mm 20mm;}
+    body{font-family:'Arial',sans-serif;color:#1e293b;margin:0;font-size:12px;}
+    h1{font-size:16px;color:#b45309;margin-bottom:2px;}
+    .sub{font-size:10px;color:#64748b;margin-bottom:14px;}
+    .section-label{font-size:9px;font-weight:700;color:#d97706;letter-spacing:.12em;text-transform:uppercase;margin:14px 0 6px;border-bottom:1.5px solid #fde68a;padding-bottom:3px;}
+    .answer-box{border:1px solid #e2e8f0;border-radius:5px;padding:8px 10px;min-height:56px;font-size:12px;color:#334155;background:#fffbf5;line-height:1.65;margin-bottom:12px;}
+    .footer{margin-top:14px;font-size:9.5px;color:#94a3b8;border-top:1px solid #e2e8f0;padding-top:7px;display:flex;justify-content:space-between;}
+    .badge{display:inline-block;background:#fffbeb;border:1px solid #fcd34d;border-radius:4px;padding:2px 8px;font-size:10px;color:#b45309;margin-bottom:10px;}
+    .identity-row{display:flex;gap:30px;margin-bottom:14px;font-size:11px;color:#475569;}
+    .identity-row span{border-bottom:1px solid #94a3b8;min-width:150px;display:inline-block;}
+  </style></head><body>
+  <div class="badge">🍄 Lab Maya Biologi – Jamur (Fungi) · Kelas X SMA</div>
+  <h1>💬 Diskusi Hasil Percobaan</h1>
+  <div class="sub">Dicetak: ${tgl}</div>
+  <div class="identity-row">
+    <div>Nama: <span>&nbsp;</span></div>
+    <div>Kelas: <span>&nbsp;</span></div>
+    <div>Tanggal: <span>&nbsp;</span></div>
+  </div>
+  <div class="section-label">A. Pertanyaan Analisis</div>
+  ${analisisHTML}
+  <div class="section-label">B. Kesimpulan</div>
+  <div class="answer-box">${(dqData[7]||'').replace(/\n/g,'<br>')||'<span style="color:#94a3b8;font-style:italic;">(belum diisi)</span>'}</div>
+  <div class="section-label">C. Refleksi</div>
+  <div class="answer-box">${(dqData[8]||'').replace(/\n/g,'<br>')||'<span style="color:#94a3b8;font-style:italic;">(belum diisi)</span>'}</div>
+  <div class="footer">
+    <span>Lab Maya Biologi – Jamur (Fungi)</span>
+    <span>Tanda Tangan Guru: _____________________</span>
+  </div>
+  <script>window.onload=()=>{window.print();}<\/script>
+  </body></html>`);
+  w.document.close();
+}
+
+/* ══ INIT ══ */
+document.addEventListener('DOMContentLoaded',()=>{
+  buildLabSteps(labSteps1,'labSteps1');
+  buildLabSteps(labSteps2,'labSteps2');
+  buildLabSteps(labSteps3,'labSteps3');
+  buildSimSteps(simSteps,'simStepsList');
+  document.querySelectorAll('.drag-item').forEach(_attachDrag);
+  resizeCanvas();onParamChange();regen();drawScene();
+});
+window.addEventListener('resize',()=>{
+  if(!isRunning){resizeCanvas();regen();drawScene();}
+});
+</script>
+</body>
+</html>
